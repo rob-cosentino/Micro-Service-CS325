@@ -27,11 +27,12 @@ app.post('/translate', async (req, res) => {
             const detectedLanguage = response.data.translations[0].detected_source_language;
             const translatedText = response.data.translations[0].text;
 
-            if (detectedLanguage !== 'EN') {
+            // checking if input lang is english or translation is the same as input
+            if (detectedLanguage !== 'EN' && translatedText !== payload) {
                 res.json({ translated: translatedText })
             } else {
                 // For text that is already english or undefined ('und')
-                res.json({ translated: payload });
+                res.json({ translated: payload, note: 'Text already in English or translation not supported' });
             }
         } else {
             res.status(400).json({ error: 'No payload provided' })
