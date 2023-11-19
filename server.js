@@ -1,41 +1,41 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import fetch from 'node-fetch';
-import { franc } from 'franc';
+const express = require('express')
+const axios = require('axios')
 
 const app = express();
-app.use(bodyParser.json());
+app.use(express.json());
 
 app.post('/translate', async (req, res) => {
     try {
         const { payload } = req.body;
-        const lang = franc(payload);
-        console.log("Detected language:", lang)
+        console.log('Received payload:', payload)
 
-        // Checking if language is not english 
-        if (lang !== 'eng' && lang !== 'und') {
-            // Making post request to LibreTranslate API to translate
-            const translateResponse = await fetch('https://libretranslate.com/translate', {
-                method: 'POST',
-                body: JSON.stringify({
-                    q: payload,
-                    source: lang,  // Detect language
-                    target: 'en'   // Target language is english 
-                }),
-                header: { 'Content-Type': 'application/json' }
+        if (payload) {
+            const deepLApiKey = '3b8b578b-5d63-fce5-6bb6-05e74c28a4fc:fx'
+            const deepLUrl = `https://api-free.deepl.com/v2/translate`
+    
+            const response = await axios.post(deepLUrl, {
+                text: [payload],
+                target_lang: 'EN'
+            }, {
+                headers: {
+                    'Authorization': `DeepL-Auth-Key ${deepLApiKey}`,
+                    'Content-Type': 'application/json'
+                }
             });
+            console.log('DeepL API response:', response.data)
 
-            if (!translateResponse.ok) {
-                throw new Error('There was an error with the translation API');
+            const detectedLanguage = response.data.translations[0].detected_source_language;
+            const translatedText = response.data.translations[0].text;
+
+            if (detectedLanguage !== 'EN') {
+                res.json({ translated: translatedText })
+            } else {
+                // For text that is already english or undefined ('und')
+                res.json({ translated: payload });
             }
-
-            const translatedData = await translateResponse.json();
-            console.log("Translated language:", lang)
-            res.json({ translated: translatedData.translatedText });
         } else {
-            // For text that is already english or undefined ('und')
-            res.json({ translated: payload });
-        }
+            res.status(400).json({ error: 'No payload provided' })
+        }    
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -47,5 +47,3 @@ const PORT = 8000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 });
-// res.json({ translated: translatedText });
-
