@@ -36,5 +36,6 @@ In a case in which the microservice receives an invalid or empty payload, error 
 The rate limit is currently set to 100 translation requests per 15 minutes
 
 # UML Sequence Diagram
-```markdown
+Below is a UML sequence diagram meant to visually illustrate how requesting and receiving data from the microservice functions:
+
 ![UML-sequence](https://github.com/rob-cosentino/translation-microservice/assets/112352526/e490eec8-3c6f-439d-ab41-57e947010eb4)
