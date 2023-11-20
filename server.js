@@ -1,18 +1,35 @@
+// Loading environment variables (.env)
+require('dotenv').config()
+
+// Node Modules
 const express = require('express')
 const axios = require('axios')
-
+const rateLimit = require('express-rate-limit')
 const app = express();
+
+// Utilizing express.json for JSON request parsing
 app.use(express.json());
 
+// Rate limit for the API (abuse prevention - 100 calls per 15 minutes)
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,      
+    max: 100
+});
+app.use(limiter)
+
+
+
+// Defining post endpoint
 app.post('/translate', async (req, res) => {
     try {
         const { payload } = req.body;
         console.log('Received payload:', payload)
 
         if (payload) {
-            const deepLApiKey = '3b8b578b-5d63-fce5-6bb6-05e74c28a4fc:fx'
+            const deepLApiKey = process.env.DEEPL_API_KEY
             const deepLUrl = `https://api-free.deepl.com/v2/translate`
     
+            // POST request to DeepL 
             const response = await axios.post(deepLUrl, {
                 text: [payload],
                 target_lang: 'EN'
@@ -24,10 +41,11 @@ app.post('/translate', async (req, res) => {
             });
             console.log('DeepL API response:', response.data)
 
+            // Extract detected language and translated text 
             const detectedLanguage = response.data.translations[0].detected_source_language;
             const translatedText = response.data.translations[0].text;
 
-            // checking if input lang is english or translation is the same as input
+            // Translation conditions 
             if (detectedLanguage !== 'EN' && translatedText !== payload) {
                 res.json({ translated: translatedText })
             } else {
@@ -42,7 +60,6 @@ app.post('/translate', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-
 
 const PORT = 8000;
 app.listen(PORT, () => {
