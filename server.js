@@ -53,15 +53,17 @@ app.post('/translate', async (req, res) => {
                 res.json({ translated: payload, note: 'Text already in English or translation not supported' });
             }
         } else {
+            // For empty inputs
             res.status(400).json({ error: 'No payload provided' })
         }    
     } catch (error) {
+        // For errors regarding the API 
         console.error('Error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 });
