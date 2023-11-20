@@ -34,4 +34,4 @@ The rate limit is currently set to 100 translation requests per 15 minutes
 
 # UML Sequence Diagram
 
-![uml-sequence](https://github.com/rob-cosentino/translation-microservice/assets/112352526/cb711df9-db82-4c86-acd4-24679c8c5350)
+![UML-sequence](https://github.com/rob-cosentino/translation-microservice/assets/112352526/e490eec8-3c6f-439d-ab41-57e947010eb4)
